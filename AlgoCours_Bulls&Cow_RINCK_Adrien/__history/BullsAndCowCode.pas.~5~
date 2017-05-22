@@ -1,0 +1,65 @@
+unit BullsAndCowCode;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls;
+
+type
+  TForm2 = class(TForm)
+    MesMots: TMemo;
+    Panel1: TPanel;
+    Chaine: TEdit;
+    cmdLancement: TButton;
+    Label1: TLabel;
+    NbTaille: TEdit;
+    procedure FormCreate(Sender: TObject);
+    Procedure MotATrouver(Sender: TObject; var Taille:integer);
+    procedure cmdLancementClick(Sender: TObject);
+  private
+    { Déclarations privées }
+  public
+    { Déclarations publiques }
+  end;
+Const NbMot=10;
+var
+  Form2: TForm2;
+  MotADeviner,MaChaine:string;
+
+implementation
+
+{$R *.dfm}
+//---------- Initialisation des mots a deviner ----------//
+procedure TForm2.FormCreate(Sender: TObject);
+begin
+  MesMots.Lines.LoadFromFile('Dico.txt');
+end;
+
+//---------- Fonction de calcul de longueur de chaine ----------//
+function LgChaine(MaChaine:string):integer;
+begin
+    LgChaine:=Length(MaChaine);
+end;
+
+Procedure TForm2.MotATrouver(Sender: TObject; var Taille:integer);
+var
+  Nb:integer;
+begin
+  randomize;
+  Nb:=(random(NbMot));
+  MotADeviner:=MesMots.Lines[Nb];
+  Taille:=LgChaine(MotADeviner);
+  NbTaille.Text:=inttostr(Taille);
+end;
+
+procedure TForm2.cmdLancementClick(Sender: TObject;Taille:integer);
+begin
+  MaChaine:=Chaine.Text;
+  MotATrouver(Sender,Taille);
+  cmdLancement.Enabled:=False;
+  showMessage('test');
+  Chaine.Text:=MotADeviner;
+
+end;
+end.

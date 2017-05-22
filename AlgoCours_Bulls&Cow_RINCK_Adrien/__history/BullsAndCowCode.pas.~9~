@@ -1,0 +1,141 @@
+unit BullsAndCowCode;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls;
+
+type
+  TForm2 = class(TForm)
+    MesMots: TMemo;
+    Panel1: TPanel;
+    Chaine: TEdit;
+    cmdLancement: TButton;
+    Label1: TLabel;
+    NbTaille: TEdit;
+    cmdValider: TButton;
+    BullsnCowLabel: TLabel;
+    NbBulls: TEdit;
+    NbCow: TEdit;
+    procedure FormCreate(Sender: TObject);
+    Procedure MotATrouver(Sender: TObject; var Taille:integer);
+    procedure cmdLancementClick(Sender: TObject);
+    procedure cmdValiderClick(Sender: TObject);
+    Procedure Bulls(Sender:TObject;var BullsNb:integer);
+    Procedure Cows(Sender:TObject;var CowsNb:integer);
+    Function ValidationInput():Boolean;
+  private
+    { Déclarations privées }
+  public
+    { Déclarations publiques }
+  end;
+Const NbMot=10;
+      Min=1;
+      Alphabet='abcdefghijklmnopqrstuvwxyz';
+var
+  Form2: TForm2;
+  MotADeviner,MaChaine:string;
+  BullsNb,CowsNb,Taille:integer;
+
+implementation
+
+{$R *.dfm}
+//---------- Initialisation des mots a deviner ----------//
+procedure TForm2.FormCreate(Sender: TObject);
+begin
+  MesMots.Lines.LoadFromFile('Dico.txt');
+end;
+
+//---------- Fonction de calcul de longueur de chaine ----------//
+function LgChaine(MaChaine:string):integer;
+begin
+    LgChaine:=Length(MaChaine);
+end;
+
+//---------- Initalisation du mot à trouver ----------//
+Procedure TForm2.MotATrouver(Sender: TObject; var Taille:integer);
+var
+  Nb:integer;
+begin
+  randomize;
+  Nb:=(random(NbMot));
+  MotADeviner:=MesMots.Lines[Nb];
+  Taille:=LgChaine(MotADeviner);
+  NbTaille.Text:=inttostr(Taille);
+end;
+
+//---------- Action après click sur "Commencer" ----------//
+procedure TForm2.cmdLancementClick(Sender: TObject);
+begin
+  MotATrouver(Sender,Taille);
+  cmdLancement.Enabled:=False;
+end;
+
+//---------- Action après click sur "Valider" ----------//
+procedure TForm2.cmdValiderClick(Sender: TObject);
+begin
+  MaChaine:=Chaine.Text;
+  ValidationInput();
+  if ValidationInput=True then
+  begin
+    Bulls(Sender,BullsNb);
+    Cows(Sender,CowsNb);
+  end
+  else showmessage('Pas de caractères spéciaux !'+#10+'Entrez '+inttostr(Taille)+' caractères');
+end;
+
+//---------- Calcul du nombre de taureau ----------//
+Procedure TForm2.Bulls(Sender:TObject;var BullsNb:integer);
+var
+  i:integer;
+begin
+  BullsNb:=0;
+  for i := MIN to Taille do
+    begin
+      if MaChaine[i]=MotADeviner[i] then
+        begin
+          BullsNb:=BullsNB+1;
+        end;
+    end;
+    NbBulls.Text:=inttostr(BullsNb);
+end;
+//---------- Calcul du nombres de vaches ----------//
+Procedure TForm2.Cows(Sender:TObject;var CowsNb:integer);
+var
+  i,j:integer;
+begin
+  CowsNb:=0;
+  for i := MIN to Taille do
+    begin
+      for j := MIN to Taille do
+        begin
+          if MaChaine[i]=MotADeviner[j] then
+             CowsNb:=CowsNb+1;
+        end;
+    end;
+      NbCow.Text:=inttostr(CowsNb);
+end;
+//---------- Fonction validation de l'input -----------//
+Function TForm2.ValidationInput():Boolean;
+var
+  i,j:integer;
+  Valid:integer;
+begin
+  Valid:=0;
+  for i := MIN to LgChaine(MaChaine) do
+    begin
+      for j := MIN to LgChaine(Alphabet) do
+        begin
+          if MaChaine[i]=Alphabet[j] then
+              Valid:=Valid+1;
+        end;
+    end;
+    if Valid=LgChaine(MaChaine) then
+       ValidationInput:=True
+    else ValidationInput:=False;
+    if LgChaine(MotADeviner)<>LgChaine(MaChaine) then    //Verif. que la taille de l'input
+      ValidationInput:=False                             //Soit égale à celui du mot à deviner
+    else ValidationInput:=True;
+end;
+end.
